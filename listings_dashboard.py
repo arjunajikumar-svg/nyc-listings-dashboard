@@ -195,13 +195,22 @@ st.divider()
 st.subheader("3 · Geographic distribution")
 coords = filtered.dropna(subset=["latitude", "longitude"]).copy()
 coords = coords[coords["latitude"].between(-90, 90) & coords["longitude"].between(-180, 180)]
-if not coords.empty:
+if not coords.empty and "latitude" in coords.columns and "longitude" in coords.columns:
     hover_cols = [c for c in ["room_type", "neighbourhood", "price", "number_of_reviews"] if c in coords.columns]
-    fig = px.scatter_mapbox(
-        coords, lat="latitude", lon="longitude", color="room_type",
+    fig = px.scatter_geo(
+        coords,
+        lat="latitude",
+        lon="longitude",
+        color="room_type",
         hover_name="name" if "name" in coords.columns else None,
-        hover_data=hover_cols, zoom=9, height=440, mapbox_style="open-street-map",
-        labels={"room_type": "Room type", "price": "Listed price", "number_of_reviews": "Reviews"},
+        hover_data=hover_cols,
+        projection="natural earth",
+        height=440,
+        labels={
+            "room_type": "Room type",
+            "price": "Listed price",
+            "number_of_reviews": "Reviews",
+        },
     )
     fig.update_traces(marker={"size": 7, "opacity": 0.72})
     fig.update_layout(margin=dict(l=0, r=0, t=0, b=0), legend_title_text="Room type")
